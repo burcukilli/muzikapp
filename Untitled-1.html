@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Basit MP3 Müzik Çalar</title>
+  <style>
+    body {
+      background: #121212;
+      color: #eee;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    h1 {
+      margin-bottom: 20px;
+    }
+    #player {
+      background: #222;
+      border-radius: 10px;
+      padding: 20px;
+      width: 320px;
+      box-shadow: 0 0 10px #00aaff;
+    }
+    #playlist {
+      margin-top: 15px;
+      max-height: 150px;
+      overflow-y: auto;
+      border: 1px solid #444;
+      border-radius: 5px;
+      padding: 5px;
+    }
+    #playlist div {
+      padding: 5px;
+      cursor: pointer;
+      border-radius: 3px;
+    }
+    #playlist div:hover, #playlist .active {
+      background: #00aaff;
+      color: #121212;
+    }
+    button {
+      background: #00aaff;
+      border: none;
+      padding: 10px 15px;
+      margin: 0 5px;
+      border-radius: 5px;
+      color: #121212;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background: #0088cc;
+    }
+    #controls {
+      display: flex;
+      justify-content: center;
+      margin-top: 15px;
+    }
+    #volume {
+      width: 100%;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+  <h1>MP3 Müzik Çalar</h1>
+  <div id="player">
+    <audio id="audio" preload="metadata"></audio>
+
+    <div id="nowPlaying">Şarkı seçiniz...</div>
+
+    <div id="controls">
+      <button id="prevBtn">⏮️</button>
+      <button id="playPauseBtn">▶️</button>
+      <button id="nextBtn">⏭️</button>
+    </div>
+
+    <input type="range" id="volume" min="0" max="1" step="0.01" value="0.5" />
+
+    <div id="playlist"></div>
+  </div>
+
+  <script>
+    // Şarkı listesi (MP3 dosya isimleri ve başlıkları)
+    const songs = [
+      { title: "Şarkı 1", file: "songs/song1.mp3" },
+      { title: "Şarkı 2", file: "songs/song2.mp3" },
+      { title: "Şarkı 3", file: "songs/song3.mp3" }
+    ];
+
+    const audio = document.getElementById("audio");
+    const playPauseBtn = document.getElementById("playPauseBtn");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const playlistDiv = document.getElementById("playlist");
+    const nowPlaying = document.getElementById("nowPlaying");
+    const volumeSlider = document.getElementById("volume");
+
+    let currentIndex = 0;
+    let isPlaying = false;
+
+    // Playlist'i ekrana yaz
+    function loadPlaylist() {
+      songs.forEach((song, index) => {
+        const div = document.createElement("div");
+        div.textContent = song.title;
+        div.addEventListener("click", () => {
+          currentIndex = index;
+          loadSong(currentIndex);
+          playSong();
+          updatePlaylistHighlight();
+        });
+        playlistDiv.appendChild(div);
+      });
+      updatePlaylistHighlight();
+    }
+
+    // Şarkıyı yükle
+    function loadSong(index) {
+      audio.src = songs[index].file;
+      nowPlaying.textContent = `Çalıyor: ${songs[index].title}`;
+    }
+
+    // Oynat
+    function playSong() {
+      audio.play();
+      isPlaying = true;
+      playPauseBtn.textContent = "⏸️";
+    }
+
+    // Durdur
+    function pauseSong() {
+      audio.pause();
+      isPlaying = false;
+      playPauseBtn.textContent = "▶️";
+    }
+
+    // Oynat / Durdur toggle
+    playPauseBtn.addEventListener("click", () => {
+      if (isPlaying) {
+        pauseSong();
+      } else {
+        playSong();
+      }
+    });
+
+    // Önceki şarkı
+    prevBtn.addEventListener("click", () => {
+      currentIndex--;
+      if (currentIndex < 0) currentIndex = songs.length - 1;
+      loadSong(currentIndex);
+      playSong();
+      updatePlaylistHighlight();
+    });
+
+    // Sonraki şarkı
+    nextBtn.addEventListener("click", () => {
+      currentIndex++;
+      if (currentIndex >= songs.length) currentIndex = 0;
+      loadSong(currentIndex);
+      playSong();
+      updatePlaylistHighlight();
+    });
+
+    // Şarkı bittiğinde otomatik sonraki şarkıya geç
+    audio.addEventListener("ended", () => {
+      nextBtn.click();
+    });
+
+    // Ses kontrolü
+    volumeSlider.addEventListener("input", () => {
+      audio.volume = volumeSlider.value;
+    });
+
+    // Playlist aktif şarkıyı vurgula
+    function updatePlaylistHighlight() {
+      const children = playlistDiv.children;
+      for (let i = 0; i < children.length; i++) {
+        children[i].classList.toggle("active", i === currentIndex);
+      }
+    }
+
+    // Sayfa açıldığında playlisti ve ilk şarkıyı hazırla
+    loadPlaylist();
+    loadSong(currentIndex);
+    audio.volume = volumeSlider.value;
+  </script>
+</body>
+</html>

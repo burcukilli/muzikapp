@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Müzik Uygulaması</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #121212;
+    color: white;
+    margin: 0; padding: 0;
+  }
+  nav {
+    background: #222;
+    display: flex;
+    gap: 15px;
+    padding: 10px 20px;
+  }
+  nav button {
+    background: #00aaff;
+    border: none;
+    color: black;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  nav button.active {
+    background: #0088cc;
+  }
+  section {
+    display: none;
+    padding: 20px;
+  }
+  section.active {
+    display: block;
+  }
+  input, button, select {
+    padding: 8px;
+    margin: 5px 0;
+    border-radius: 5px;
+    border: none;
+  }
+  input[type="text"], input[type="password"] {
+    width: 100%;
+  }
+  .error {
+    color: #ff4444;
+  }
+  #playlist li {
+    cursor: pointer;
+    margin: 5px 0;
+    list-style: none;
+    padding: 5px;
+    background: #333;
+    border-radius: 5px;
+  }
+  #playlist li:hover {
+    background: #00aaff;
+    color: black;
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <button id="btn-login" class="active">Kullanıcı Girişi</button>
+  <button id="btn-player">Müzik Çalar</button>
+  <button id="btn-playlist">Çalma Listesi</button>
+</nav>
+
+<!-- Kullanıcı Girişi -->
+<section id="section-login" class="active">
+  <h2>Kullanıcı Girişi</h2>
+  <input type="text" id="username" placeholder="Kullanıcı Adı" />
+  <input type="password" id="password" placeholder="Şifre" />
+  <button onclick="login()">Giriş Yap</button>
+  <p id="login-error" class="error"></p>
+</section>
+
+<!-- Müzik Çalar -->
+<section id="section-player">
+  <h2>Müzik Çalar</h2>
+  <input type="file" id="file-input" accept="audio/*" multiple />
+  <br />
+  <audio id="audio-player" controls></audio>
+</section>
+
+<!-- Çalma Listesi -->
+<section id="section-playlist">
+  <h2>Çalma Listesi</h2>
+  <ul id="playlist"></ul>
+</section>
+
+<script>
+  // Menü butonları ve bölümler
+  const btnLogin = document.getElementById('btn-login');
+  const btnPlayer = document.getElementById('btn-player');
+  const btnPlaylist = document.getElementById('btn-playlist');
+
+  const sectionLogin = document.getElementById('section-login');
+  const sectionPlayer = document.getElementById('section-player');
+  const sectionPlaylist = document.getElementById('section-playlist');
+
+  function switchSection(activeBtn, activeSection) {
+    [btnLogin, btnPlayer, btnPlaylist].forEach(b => b.classList.remove('active'));
+    [sectionLogin, sectionPlayer, sectionPlaylist].forEach(s => s.classList.remove('active'));
+
+    activeBtn.classList.add('active');
+    activeSection.classList.add('active');
+  }
+
+  btnLogin.onclick = () => switchSection(btnLogin, sectionLogin);
+  btnPlayer.onclick = () => switchSection(btnPlayer, sectionPlayer);
+  btnPlaylist.onclick = () => switchSection(btnPlaylist, sectionPlaylist);
+
+  // Basit kullanıcı girişi
+  function login() {
+    const user = document.getElementById('username').value.trim();
+    const pass = document.getElementById('password').value.trim();
+    const error = document.getElementById('login-error');
+
+    if(user === 'admin' && pass === '1234') {
+      error.textContent = '';
+      alert('Giriş başarılı! Müzik çalar bölümüne geçebilirsiniz.');
+      switchSection(btnPlayer, sectionPlayer);
+    } else {
+      error.textContent = 'Kullanıcı adı veya şifre hatalı!';
+    }
+  }
+
+  // Çalma listesi ve dosya yükleme
+  const fileInput = document.getElementById('file-input');
+  const audioPlayer = document.getElementById('audio-player');
+  const playlist = document.getElementById('playlist');
+
+  let songs = [];
+
+  fileInput.addEventListener('change', (e) => {
+    const files = e.target.files;
+    for(let i=0; i<files.length; i++) {
+      const file = files[i];
+      const url = URL.createObjectURL(file);
+      songs.push({name: file.name, url});
+    }
+    updatePlaylist();
+  });
+
+  function updatePlaylist() {
+    playlist.innerHTML = '';
+    songs.forEach((song, index) => {
+      const li = document.createElement('li');
+      li.textContent = song.name;
+      li.onclick = () => {
+        audioPlayer.src = song.url;
+        audioPlayer.play();
+      };
+      playlist.appendChild(li);
+    });
+  }
+</script>
+
+</body>
+</html>

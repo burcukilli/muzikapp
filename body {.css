@@ -1,0 +1,17 @@
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(to right, #1e3c72, #2a5298); /* Mavi tonlarda gradient */
+    color: white;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    width: 80%;
+    margin: auto;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.5); /* Hafif siyah transparan arka plan */
+    border-radius: 10px;
+    backdrop-filter: blur(10px); /* Hafif bulanıklık efekti */
+}
